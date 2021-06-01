@@ -1,59 +1,47 @@
-# @apideck/better-ajv-errors 👮‍♀️
+# better-json-schema-errors
 
 > Human-friendly JSON Schema validation for APIs
 
-- Readable and helpful [ajv](https://github.com/ajv-validator/ajv) errors
+- Readable and helpful [JSON Schema](https://github.com/) errors
 - API-friendly format
 - Suggestions for spelling mistakes
 - Minimal footprint: 1.56 kB (gzip + minified)
 
-![better-ajv-errors output Example](https://user-images.githubusercontent.com/8850410/118274790-e0529e80-b4c5-11eb-8188-9097c8064c61.png)
+![better-json-schema-errors output Example](https://user-images.githubusercontent.com/8850410/118274790-e0529e80-b4c5-11eb-8188-9097c8064c61.png)
 
 ## Install
 
 ```bash
-$ yarn add @apideck/better-ajv-errors
+$ npm i better-json-schema-errors
 ```
-
-or
-
-```bash
-$ npm i @apideck/better-ajv-errors
-```
-
-Also make sure that you've installed [ajv](https://www.npmjs.com/package/ajv) at version 8 or higher.
 
 ## Usage
 
-After validating some data with ajv, pass the errors to `betterAjvErrors`
+After validating some data with a compliant JSON Schema validator, pass the errors to `betterJsonSchemaErrors`
 
 ```ts
-import Ajv from 'ajv';
-import { betterAjvErrors } from '@apideck/better-ajv-errors';
+import { betterJsonSchemaErrors } from 'better-json-schema-errors';
 
-// Without allErrors: true, ajv will only return the first error
-const ajv = new Ajv({ allErrors: true });
-
-const valid = ajv.validate(schema, data);
+const valid = validator.validate(schema, data);
 
 if (!valid) {
-  const betterErrors = betterAjvErrors({ schema, data, errors: ajv.errors });
+  const betterErrors = betterJsonSchemaErrors({ schema, data, errors: validator.errors });
 }
 ```
 
 ## API
 
-### betterAjvErrors
+### betterJsonSchemaErrors
 
-Function that formats ajv validation errors in a human-friendly format.
+Function that formats JSON Schema validation errors in a human-friendly format.
 
 #### Parameters
 
-- `options: BetterAjvErrorsOptions`
-  - `errors: ErrorObject[] | null | undefined` Your ajv errors, you will find these in the `errors` property of your ajv instance (`ErrorObject` is a type from the ajv package).
-  - `data: Object` The data you passed to ajv to be validated.
-  - `schema: JSONSchema` The schema you passed to ajv to validate against.
-  - `basePath?: string` An optional base path to prefix paths returned by `betterAjvErrors`. For example, in APIs, it could be useful to use `'{requestBody}'` or `'{queryParemeters}'` as a basePath. This will make it clear to users where exactly the error occurred.
+- `options: BetterJsonSchemaErrorsOptions`
+  - `errors: ErrorObject[] | null | undefined` Your errors, you will find these in the `errors` property of your validator instance (`ErrorObject` is a type defined by JSON Schema).
+  - `data: Object` The data you passed to the validator.
+  - `schema: JSONSchema` The schema you passed to the validator to validate against.
+  - `basePath?: string` An optional base path to prefix paths returned by `betterJsonSchemaErrors`. For example, in APIs, it could be useful to use `'{requestBody}'` or `'{queryParemeters}'` as a basePath. This will make it clear to users where exactly the error occurred.
 
 #### Return Value
 
@@ -61,8 +49,9 @@ Function that formats ajv validation errors in a human-friendly format.
   - `message: string` Formatted error message
   - `suggestion?: string` Optional suggestion based on provided data and schema
   - `path: string` Object path where the error occurred (example: `.foo.bar.0.quz`)
-  - `context: { errorType: DefinedError['keyword']; [additionalContext: string]: unknown }` `errorType` is `error.keyword` proxied from `ajv`. `errorType` can be used as a key for i18n if needed. There might be additional properties on context, based on the type of error.
+  - `context: { errorType: DefinedError['keyword']; [additionalContext: string]: unknown }` `errorType` is `error.keyword` proxied from the validator. `errorType` can be used as a key for i18n if needed. There might be additional properties on context, based on the type of error.
 
 ## Related
 
-- [atlassian/better-ajv-errors](https://github.com/atlassian/better-ajv-errors) was the inspiration for this library. Atlassian's library is more focused on CLI errors, this library is focused on developer-friendly API error messages.
+* https://github.com/apideck-libraries/better-ajv-errors
+
