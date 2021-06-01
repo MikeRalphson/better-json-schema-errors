@@ -1,0 +1,75 @@
+{
+  "name": "better-json-schema-errors",
+  "description": "Human-friendly JSON Schema validation for APIs",
+  "version": "0.2.3",
+  "author": "Apideck <support@apideck.com> (https://apideck.com/)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mermade/better-json-schema-errors"
+  },
+  "bugs": {
+    "url": "https://github.com/Mermade/better-json-schema-errors/issues"
+  },
+  "main": "dist/index.js",
+  "module": "dist/better-json-schema-errors.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "release": "np",
+    "analyze": "size-limit --why"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "size-limit": [
+    {
+      "path": "dist/better-json-schema-errors.cjs.production.min.js",
+      "limit": "2 KB"
+    },
+    {
+      "path": "dist/better-json-schema-errors.esm.js",
+      "limit": "2 KB"
+    }
+  ],
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^4.11.0",
+    "husky": "^6.0.0",
+    "np": "^7.5.0",
+    "size-limit": "^4.11.0",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.2.0",
+    "typescript": "^3.9.4"
+  },
+  "dependencies": {
+    "json-schema": "^0.3.0",
+    "jsonpointer": "^4.1.0",
+    "leven": "^3.1.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "keywords": [
+    "json",
+    "schema",
+    "json-schema",
+    "errors",
+    "human",
+    "postman"
+  ]
+}
