@@ -1,38 +1,37 @@
-import { DefinedError, ErrorObject } from 'ajv';
 import type { JSONSchema6 } from 'json-schema';
-import { ValidationError } from './types/ValidationError';
+import { ValidationError } from '@exodus/schemasafe';
 import { filterSingleErrorPerProperty } from './lib/filter';
 import { getSuggestion } from './lib/suggestions';
-import { cleanAjvMessage, getLastSegment, pointerToDotNotation, safeJsonPointer } from './lib/utils';
+import { cleanJsonSchemaMessage, getLastSegment, pointerToDotNotation, safeJsonPointer } from './lib/utils';
 
-export interface BetterAjvErrorsOptions {
-  errors: ErrorObject[] | null | undefined;
+export interface BetterJsonSchemaErrorsOptions {
+  errors: ValidationError[] | null | undefined;
   data: any;
   schema: JSONSchema6;
   basePath?: string;
 }
 
-export const betterAjvErrors = ({
+export const betterJsonSchemaErrors = ({
   errors,
   data,
   schema,
   basePath = '{base}',
-}: BetterAjvErrorsOptions): ValidationError[] => {
+}: BetterJsonSchemaErrorsOptions): ValidationError[] => {
   if (!Array.isArray(errors) || errors.length === 0) {
     return [];
   }
 
-  const definedErrors = filterSingleErrorPerProperty(errors as DefinedError[]);
+  const definedErrors = filterSingleErrorPerProperty(errors as ValidationError[]);
 
   return definedErrors.map((error) => {
-    const path = pointerToDotNotation(basePath + error.instancePath);
-    const prop = getLastSegment(error.instancePath);
+    const path = pointerToDotNotation(basePath + error.instanceLocation);
+    const prop = getLastSegment(error.instanceLocation);
     const defaultContext = {
       errorType: error.keyword,
     };
-    const defaultMessage = `${prop ? `property '${prop}'` : path} ${cleanAjvMessage(error.message as string)}`;
+    const defaultMessage = `${prop ? `property '${prop}'` : path} ${cleanJsonSchemaMessage(error.message as string)}`;
 
-    let validationError: ValidationError;
+    let validationError: any; //ValidationError;
 
     switch (error.keyword) {
       case 'additionalProperties': {
@@ -57,8 +56,8 @@ export const betterAjvErrors = ({
       }
       case 'enum': {
         const suggestions = error.params.allowedValues;
-        const prop = getLastSegment(error.instancePath);
-        const value = safeJsonPointer({ object: data, pnter: error.instancePath, fallback: '' });
+        const prop = getLastSegment(error.instanceLocation);
+        const value = safeJsonPointer({ object: data, pnter: error.instanceLocation, fallback: '' });
         validationError = {
           message: `'${prop}' property must be equal to one of the allowed values`,
           suggestion: getSuggestion({
@@ -74,7 +73,7 @@ export const betterAjvErrors = ({
         break;
       }
       case 'type': {
-        const prop = getLastSegment(error.instancePath);
+        const prop = getLastSegment(error.instanceLocation);
         const type = error.params.type;
         validationError = {
           message: `'${prop}' property type must be ${type}`,
@@ -108,4 +107,4 @@ export const betterAjvErrors = ({
   });
 };
 
-export { ValidationError } from 'types/ValidationError';
+export { ValidationError } from '@exodus/schemasafe';

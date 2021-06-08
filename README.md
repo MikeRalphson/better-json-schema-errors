@@ -4,7 +4,7 @@
 
 - Readable and helpful [JSON Schema](https://github.com/) errors
 - API-friendly format
-- Suggestions for spelling mistakes
+- Suggestions for spelling mistakes (using Jaro-Winkler, not the more simplistic Levenshtein) distance algorithm
 - Minimal footprint: 1.56 kB (gzip + minified)
 
 ![better-json-schema-errors output Example](https://user-images.githubusercontent.com/8850410/118274790-e0529e80-b4c5-11eb-8188-9097c8064c61.png)

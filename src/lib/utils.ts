@@ -5,7 +5,7 @@ export const pointerToDotNotation = (pointer: string): string => {
   return pointer.replace(SLASH_REGEX, '.');
 };
 
-export const cleanAjvMessage = (message: string): string => {
+export const cleanJsonSchemaMessage = (message: string): string => {
   return message.replace(QUOTES_REGEX, "'").replace(NOT_REGEX, 'not');
 };
 

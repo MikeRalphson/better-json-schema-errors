@@ -1,14 +1,13 @@
-import Ajv from 'ajv';
+import { validator } from '@exodus/schemasafe';
 import { JSONSchema6 } from 'json-schema';
-import { betterAjvErrors } from './index';
+import { betterJsonSchemaErrors } from './index';
 
-describe('betterAjvErrors', () => {
-  let ajv: Ajv;
+describe('betterJsonSchemaErrors', () => {
   let schema: JSONSchema6;
+  let validate: any;
   let data: Record<string, unknown>;
 
   beforeEach(() => {
-    ajv = new Ajv({ allErrors: true });
     schema = {
       type: 'object',
       required: ['str'],
@@ -41,6 +40,7 @@ describe('betterAjvErrors', () => {
       },
       additionalProperties: false,
     };
+    validate = validator(schema);
   });
 
   describe('additionalProperties', () => {
@@ -49,8 +49,8 @@ describe('betterAjvErrors', () => {
         str: 'str',
         foo: 'bar',
       };
-      ajv.validate(schema, data);
-      const errors = betterAjvErrors({ data, schema, errors: ajv.errors });
+      validate(data);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -68,8 +68,8 @@ describe('betterAjvErrors', () => {
         foo: 'bar',
       };
       schema.additionalProperties = true;
-      ajv.validate(schema, data);
-      const errors = betterAjvErrors({ data, schema, errors: ajv.errors });
+      validate(data);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
       expect(errors).toEqual([]);
     });
 
@@ -78,8 +78,8 @@ describe('betterAjvErrors', () => {
         str: 'str',
         bonds: 'bar',
       };
-      ajv.validate(schema, data);
-      const errors = betterAjvErrors({ data, schema, errors: ajv.errors });
+      validate(data);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -98,8 +98,8 @@ describe('betterAjvErrors', () => {
       data = {
         nested: {},
       };
-      ajv.validate(schema, data);
-      const errors = betterAjvErrors({ data, schema, errors: ajv.errors });
+      validate(data);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -132,8 +132,8 @@ describe('betterAjvErrors', () => {
         },
       };
       data = {};
-      ajv.validate(schema, data);
-      const errors = betterAjvErrors({ data, schema, errors: ajv.errors });
+      validate(data);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -158,8 +158,8 @@ describe('betterAjvErrors', () => {
       data = {
         str: 123,
       };
-      ajv.validate(schema, data);
-      const errors = betterAjvErrors({ data, schema, errors: ajv.errors });
+      validate(data);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -178,8 +178,8 @@ describe('betterAjvErrors', () => {
         str: 'str',
         bounds: 123,
       };
-      ajv.validate(schema, data);
-      const errors = betterAjvErrors({ data, schema, errors: ajv.errors });
+      validate(data);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -198,8 +198,8 @@ describe('betterAjvErrors', () => {
         str: 'str',
         enum: 'zzzz',
       };
-      ajv.validate(schema, data);
-      const errors = betterAjvErrors({ data, schema, errors: ajv.errors });
+      validate(data);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -217,8 +217,8 @@ describe('betterAjvErrors', () => {
         str: 'str',
         enum: 'pne',
       };
-      ajv.validate(schema, data);
-      const errors = betterAjvErrors({ data, schema, errors: ajv.errors });
+      validate(data);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -257,8 +257,8 @@ describe('betterAjvErrors', () => {
         },
       },
     };
-    ajv.validate(schema, data);
-    const errors = betterAjvErrors({ data, schema, errors: ajv.errors });
+    validate(data);
+    const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
     expect(errors).toEqual([
       {
         context: {
@@ -293,7 +293,7 @@ describe('betterAjvErrors', () => {
         },
       },
     };
-    ajv.addSchema({
+    validate.addSchema({
       $id: 'http://example.com/schemas/Child.json',
       additionalProperties: false,
       type: 'object',
@@ -303,8 +303,8 @@ describe('betterAjvErrors', () => {
         },
       },
     });
-    ajv.validate(schema, data);
-    const errors = betterAjvErrors({ data, schema, errors: ajv.errors });
+    validate(data);
+    const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
     expect(errors).toEqual([
       {
         context: {

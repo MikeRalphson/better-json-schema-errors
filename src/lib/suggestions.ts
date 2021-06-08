@@ -1,4 +1,4 @@
-import leven from 'leven';
+import { jaroWinkler } from 'jaro-winkler-typescript';
 
 export const getSuggestion = ({
   value,
@@ -11,7 +11,7 @@ export const getSuggestion = ({
 }): string => {
   const bestSuggestion = suggestions.reduce(
     (best, current) => {
-      const distance = leven(value, current);
+      const distance = jaroWinkler(value, current);
       if (best.distance > distance) {
         return { value: current, distance };
       }

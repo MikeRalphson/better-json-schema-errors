@@ -1,6 +1,6 @@
-import { DefinedError } from 'ajv';
+import { ValidationError } from '@exodus/schemasafe';
 
-export const AJV_ERROR_KEYWORD_WEIGHT_MAP: Partial<Record<DefinedError['keyword'], number>> = {
+export const ERROR_KEYWORD_WEIGHT_MAP: Partial<Record<ValidationError['keywordLocation'], number>> = {
   enum: 1,
   type: 0,
 };
