@@ -19,6 +19,8 @@ $ npm i better-json-schema-errors
 
 After validating some data with a compliant JSON Schema validator, pass the errors to `betterJsonSchemaErrors`
 
+Your JSON Schema Validator should be configured to use the [Detailed](https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.12.4.3) or [Verbose](https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.12.4.4) error structure.
+
 ```ts
 import { betterJsonSchemaErrors } from 'better-json-schema-errors';
 
