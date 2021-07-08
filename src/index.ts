@@ -25,17 +25,20 @@ export const betterJsonSchemaErrors = ({
   return definedErrors.map((error) => {
     const path = pointerToDotNotation(basePath + error.instanceLocation);
     const prop = getLastSegment(error.instanceLocation);
+    const keyword = getLastSegment(error.keywordLocation);
+    const message = error.instanceLocation;
+    const error_params:any = {}; // tmp
     const defaultContext = {
-      errorType: error.keyword,
+      errorType: keyword,
     };
-    const defaultMessage = `${prop ? `property '${prop}'` : path} ${cleanJsonSchemaMessage(error.message as string)}`;
+    const defaultMessage = `${prop ? `property '${prop}'` : path} ${cleanJsonSchemaMessage(message as string)}`;
 
     let validationError: any; //ValidationError;
 
-    switch (error.keyword) {
+    switch (keyword) {
       case 'additionalProperties': {
-        const additionalProp = error.params.additionalProperty;
-        const suggestionPointer = error.schemaPath.replace('#', '').replace('/additionalProperties', '');
+        const additionalProp = error_params.additionalProperty;
+        const suggestionPointer = error.instanceLocation.replace('#', '').replace('/additionalProperties', '');
         const { properties } = safeJsonPointer({
           object: schema,
           pnter: suggestionPointer,
@@ -54,7 +57,7 @@ export const betterJsonSchemaErrors = ({
         break;
       }
       case 'enum': {
-        const suggestions = error.params.allowedValues;
+        const suggestions = error_params.allowedValues;
         const prop = getLastSegment(error.instanceLocation);
         const value = safeJsonPointer({ object: data, pnter: error.instanceLocation, fallback: '' });
         validationError = {
@@ -66,14 +69,14 @@ export const betterJsonSchemaErrors = ({
           path,
           context: {
             ...defaultContext,
-            allowedValues: error.params.allowedValues,
+            allowedValues: error_params.allowedValues,
           },
         };
         break;
       }
       case 'type': {
         const prop = getLastSegment(error.instanceLocation);
-        const type = error.params.type;
+        const type = error_params.type;
         validationError = {
           message: `'${prop}' property type must be ${type}`,
           path,
@@ -83,7 +86,7 @@ export const betterJsonSchemaErrors = ({
       }
       case 'required': {
         validationError = {
-          message: `${path} must have required property '${error.params.missingProperty}'`,
+          message: `${path} must have required property '${error_params.missingProperty}'`,
           path,
           context: defaultContext,
         };
