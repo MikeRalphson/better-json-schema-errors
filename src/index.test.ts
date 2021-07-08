@@ -1,9 +1,8 @@
-import { validator } from '@exodus/schemasafe';
-import { JSONSchema6 } from 'json-schema';
+import { validator, Schema } from '@exodus/schemasafe';
 import { betterJsonSchemaErrors } from './index';
 
 describe('betterJsonSchemaErrors', () => {
-  let schema: JSONSchema6;
+  let schema: Schema;
   let validate: any;
   let data: Record<string, unknown>;
 
@@ -38,7 +37,7 @@ describe('betterJsonSchemaErrors', () => {
           additionalProperties: false,
         },
       },
-      additionalProperties: false,
+      additionalProperties: <Schema>false,
     };
     validate = validator(schema);
   });
@@ -67,6 +66,7 @@ describe('betterJsonSchemaErrors', () => {
         str: 'str',
         foo: 'bar',
       };
+      // @ts-ignore we should be able to assign a boolean value to Schema
       schema.additionalProperties = true;
       validate(data);
       const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });

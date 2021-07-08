@@ -1,5 +1,4 @@
-import type { JSONSchema6 } from 'json-schema';
-import { ValidationError } from '@exodus/schemasafe';
+import { ValidationError,Schema } from '@exodus/schemasafe';
 import { filterSingleErrorPerProperty } from './lib/filter';
 import { getSuggestion } from './lib/suggestions';
 import { cleanJsonSchemaMessage, getLastSegment, pointerToDotNotation, safeJsonPointer } from './lib/utils';
@@ -7,7 +6,7 @@ import { cleanJsonSchemaMessage, getLastSegment, pointerToDotNotation, safeJsonP
 export interface BetterJsonSchemaErrorsOptions {
   errors: ValidationError[] | null | undefined;
   data: any;
-  schema: JSONSchema6;
+  schema: Schema;
   basePath?: string;
 }
 
