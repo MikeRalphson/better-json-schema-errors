@@ -1,4 +1,4 @@
-import { ValidationError } from '@exodus/schemasafe';
+import { ValidationError } from '@hyperjump/json-schema';
 
 export const ERROR_KEYWORD_WEIGHT_MAP: Partial<Record<ValidationError['keywordLocation'], number>> = {
   enum: 1,

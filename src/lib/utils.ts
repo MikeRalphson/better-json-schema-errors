@@ -9,7 +9,7 @@ export const cleanJsonSchemaMessage = (message: string): string => {
   return message.replace(QUOTES_REGEX, "'").replace(NOT_REGEX, 'not');
 };
 
-export const getLastSegment = (path: string): string => {
+export const getLastSegment = (path: string = ''): string => {
   const segments = path.split('/');
   return segments.pop() as string;
 };

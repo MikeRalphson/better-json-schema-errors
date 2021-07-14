@@ -1,4 +1,4 @@
-import { ValidationError,Schema } from '@exodus/schemasafe';
+import { ValidationError,Schema } from '@hyperjump/json-schema';
 import { filterSingleErrorPerProperty } from './lib/filter';
 import { getSuggestion } from './lib/suggestions';
 import { cleanJsonSchemaMessage, getLastSegment, pointerToDotNotation, safeJsonPointer } from './lib/utils';
@@ -109,4 +109,4 @@ export const betterJsonSchemaErrors = ({
   });
 };
 
-export { ValidationError } from '@exodus/schemasafe';
+export { ValidationError } from '@hyperjump/json-schema';

@@ -1,4 +1,4 @@
-import { ValidationError } from '@exodus/schemasafe';
+import { ValidationError } from '@hyperjump/json-schema';
 import { ERROR_KEYWORD_WEIGHT_MAP } from '../constants';
 
 export const filterSingleErrorPerProperty = (errors: ValidationError[]): ValidationError[] => {

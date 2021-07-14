@@ -1,13 +1,23 @@
-import { validator, Schema } from '@exodus/schemasafe';
+import { inspect } from 'util';
+import { Schema, default as jsonSchema } from '@hyperjump/json-schema';
 import { betterJsonSchemaErrors } from './index';
 
 describe('betterJsonSchemaErrors', () => {
   let schema: Schema;
-  let validate: any;
+  let schemaObj:any;
   let data: Record<string, unknown>;
 
-  beforeEach(() => {
+  async function storeSchema() {
+    await jsonSchema.add(schema);
+    // @ts-ignore we are always dealing with Object schemas not Boolean ones
+    schemaObj = await jsonSchema.get(schema.$id);
+    return schemaObj;
+  }
+
+  beforeEach(async () => {
     schema = {
+      $schema: 'https://json-schema.org/draft/2020-12/schema',
+      $id: 'https://example.com/schemas/test',
       type: 'object',
       required: ['str'],
       properties: {
@@ -37,19 +47,22 @@ describe('betterJsonSchemaErrors', () => {
           additionalProperties: false,
         },
       },
-      additionalProperties: <Schema>false,
+      additionalProperties: false,
     };
-    validate = validator(schema);
+    await storeSchema();
   });
 
   describe('additionalProperties', () => {
-    it('should handle additionalProperties=false', () => {
+    it('should handle additionalProperties=false', async () => {
       data = {
         str: 'str',
         foo: 'bar',
       };
-      validate(data);
-      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
+      //validate(data);
+      const result = await jsonSchema.validate(schemaObj, data, jsonSchema.DETAILED);
+      console.log(inspect(result));
+      expect(result.errors.length).toEqual(1);
+      /*const errors = betterJsonSchemaErrors({ data, schema, errors: result.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -58,28 +71,31 @@ describe('betterJsonSchemaErrors', () => {
           message: "'foo' property is not expected to be here",
           path: '{base}',
         },
-      ]);
+      ]);*/
     });
 
-    it('should handle additionalProperties=true', () => {
+    it('should handle additionalProperties=true', async () => {
       data = {
         str: 'str',
         foo: 'bar',
       };
       // @ts-ignore we should be able to assign a boolean value to Schema
       schema.additionalProperties = true;
-      validate(data);
-      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
+      await storeSchema();
+      //validate(data);
+      const result = await jsonSchema.validate(schemaObj, data, jsonSchema.DETAILED);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: result.errors });
       expect(errors).toEqual([]);
     });
 
-    it('should give suggestions when relevant', () => {
+    it('should give suggestions when relevant', async () => {
       data = {
         str: 'str',
         bonds: 'bar',
       };
-      validate(data);
-      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
+      //validate(data);
+      const result = await jsonSchema.validate(schemaObj, data, jsonSchema.DETAILED);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: result.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -94,12 +110,13 @@ describe('betterJsonSchemaErrors', () => {
   });
 
   describe('required', () => {
-    it('should handle required properties', () => {
+    it('should handle required properties', async () => {
       data = {
         nested: {},
       };
-      validate(data);
-      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
+      //validate(data);
+      const result = await jsonSchema.validate(schemaObj, data, jsonSchema.DETAILED);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: result.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -118,8 +135,9 @@ describe('betterJsonSchemaErrors', () => {
       ]);
     });
 
-    it('should handle multiple required properties', () => {
+    it('should handle multiple required properties', async () => {
       schema = {
+        $schema: 'https://json-schema.org/draft/2020-12/schema',
         type: 'object',
         required: ['req1', 'req2'],
         properties: {
@@ -131,9 +149,11 @@ describe('betterJsonSchemaErrors', () => {
           },
         },
       };
+      await storeSchema();
       data = {};
-      validate(data);
-      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
+      //validate(data);
+      const result = await jsonSchema.validate(schemaObj, data, jsonSchema.DETAILED);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: result.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -154,12 +174,13 @@ describe('betterJsonSchemaErrors', () => {
   });
 
   describe('type', () => {
-    it('should handle type errors', () => {
+    it('should handle type errors', async () => {
       data = {
         str: 123,
       };
-      validate(data);
-      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
+      //validate(data);
+      const result = await jsonSchema.validate(schemaObj, data, jsonSchema.DETAILED);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: result.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -173,13 +194,14 @@ describe('betterJsonSchemaErrors', () => {
   });
 
   describe('minimum/maximum', () => {
-    it('should handle minimum/maximum errors', () => {
+    it('should handle minimum/maximum errors', async () => {
       data = {
         str: 'str',
         bounds: 123,
       };
-      validate(data);
-      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
+      //validate(data);
+      const result = await jsonSchema.validate(schemaObj, data, jsonSchema.DETAILED);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: result.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -193,13 +215,14 @@ describe('betterJsonSchemaErrors', () => {
   });
 
   describe('enum', () => {
-    it('should handle enum errors', () => {
+    it('should handle enum errors', async () => {
       data = {
         str: 'str',
         enum: 'zzzz',
       };
-      validate(data);
-      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
+      //validate(data);
+      const result = await jsonSchema.validate(schemaObj, data, jsonSchema.DETAILED);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: result.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -212,13 +235,14 @@ describe('betterJsonSchemaErrors', () => {
       ]);
     });
 
-    it('should provide suggestions when relevant', () => {
+    it('should provide suggestions when relevant', async () => {
       data = {
         str: 'str',
         enum: 'pne',
       };
-      validate(data);
-      const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
+      //validate(data);
+      const result = await jsonSchema.validate(schemaObj, data, jsonSchema.DETAILED);
+      const errors = betterJsonSchemaErrors({ data, schema, errors: result.errors });
       expect(errors).toEqual([
         {
           context: {
@@ -233,11 +257,12 @@ describe('betterJsonSchemaErrors', () => {
     });
   });
 
-  it('should handle array paths', () => {
+  it('should handle array paths', async () => {
     data = {
       custom: [{ foo: 'bar' }, { aaa: 'zzz' }],
     };
     schema = {
+      $schema: 'https://json-schema.org/draft/2020-12/schema',
       type: 'object',
       properties: {
         custom: {
@@ -257,8 +282,10 @@ describe('betterJsonSchemaErrors', () => {
         },
       },
     };
-    validate(data);
-    const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
+    await storeSchema();
+    //validate(data);
+    const result = await jsonSchema.validate(schemaObj, data, jsonSchema.DETAILED);
+    const errors = betterJsonSchemaErrors({ data, schema, errors: result.errors });
     expect(errors).toEqual([
       {
         context: {
@@ -277,11 +304,12 @@ describe('betterJsonSchemaErrors', () => {
     ]);
   });
 
-  it('should handle file $refs', () => {
+  it('should handle file $refs', async () => {
     data = {
       child: [{ foo: 'bar' }, { aaa: 'zzz' }],
     };
     schema = {
+      $schema: 'https://json-schema.org/draft/2020-12/schema',
       $id: 'http://example.com/schemas/Main.json',
       type: 'object',
       properties: {
@@ -293,7 +321,9 @@ describe('betterJsonSchemaErrors', () => {
         },
       },
     };
-    validate.addSchema({
+    await storeSchema();
+    await jsonSchema.add({
+      $schema: 'https://json-schema.org/draft/2020-12/schema',
       $id: 'http://example.com/schemas/Child.json',
       additionalProperties: false,
       type: 'object',
@@ -303,8 +333,9 @@ describe('betterJsonSchemaErrors', () => {
         },
       },
     });
-    validate(data);
-    const errors = betterJsonSchemaErrors({ data, schema, errors: validate.errors });
+    //validate(data);
+    const result = await jsonSchema.validate(schemaObj, data, jsonSchema.DETAILED);
+    const errors = betterJsonSchemaErrors({ data, schema, errors: result.errors });
     expect(errors).toEqual([
       {
         context: {
